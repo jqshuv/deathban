@@ -1,0 +1,9 @@
+name: DeathBan
+version: '1.1.0'
+main: com.jqshuv.deathban.DeathBan
+api-version: '1.21'
+author: Jqshuv
+permissions:
+  deathban.immune:
+    description: Gives you immunity to death bans.
+    default: op
