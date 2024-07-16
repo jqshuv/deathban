@@ -21,11 +21,6 @@ public final class DeathBan extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new DeathListener(), this);
     }
 
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
-    }
-
     public FileConfiguration getCustomConfig() {
         return this.customConfig;
     }
