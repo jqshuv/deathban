@@ -1,6 +1,9 @@
 # DeathBan
 DeathBan is a very simple and lightweigt plugin which bans a player when he dies.
 
+**Any ideas or suggestions? Join the discord!**  
+[![discord](https://img.shields.io/discord/903750807957147718?color=7289da&label=discord&logo=discord&logoColor=white)](https://discord.com/invite/BeYVQ3fhF4)
+
 ### Configuration
 
 ```yaml
@@ -10,6 +13,6 @@ settings:
 
 ### Permissions
 
-| Permission          | Description       
-|---------------------|:--------------------------------:|
-| deathban.immune     | Gives you immunity to death bans.
+| Permission      |            Description            |
+|-----------------|:---------------------------------:|
+| deathban.immune | Gives you immunity to death bans. |
