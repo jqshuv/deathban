@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id "com.modrinth.minotaur" version "2.+"
     id "xyz.jpenilla.run-paper" version "2.3.1"
+    id "com.github.breadmoirai.github-release" version "2.4.1"
 }
 
 group = 'com.jqshuv'
@@ -61,6 +62,18 @@ modrinth {
     gameVersions = ["1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4"] // Must be an array, even with only one version
     loaders = ["bukkit", "paper", "purpur", "spigot"] // Must also be an array - no need to specify this if you're using Loom or ForgeGradle
     changelog = rootProject.file("CHANGELOG.md").text
+}
+
+githubRelease {
+    token = System.getenv("GITHUB_TOKEN")
+    owner = "jqshuv"
+    repo = "deathban"
+    tagName = "v${project.version}"
+    targetCommitish = "master"
+    releaseName = "Version ${project.version}"
+    body = rootProject.file("CHANGELOG.md").text
+    draft = true
+    releaseAssets = jar
 }
 
 tasks {
