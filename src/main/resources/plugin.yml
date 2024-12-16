@@ -1,7 +1,7 @@
 name: DeathBan
-version: '1.1.1'
+version: '1.2.1'
 main: com.jqshuv.deathban.DeathBan
-api-version: '1.21'
+api-version: '1.13'
 author: Jqshuv
 permissions:
   deathban.immune:

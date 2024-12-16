@@ -1,2 +1,6 @@
 settings:
   banreason: "Game Over!"
+  ban-delay: 3
+  spectator-after-death: true
+  ban-time: 30
+  ban-ip: false

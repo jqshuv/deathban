@@ -9,6 +9,10 @@ DeathBan is a very simple and lightweigt plugin which bans a player when he dies
 ```yaml
 settings:
   banreason: "Game Over!" # Here you set the ban reason which is shown in the ban screen.
+  ban-delay: 60 # Seconds after death till user is banned. (Can be 0 for instant ban)
+  spectator-after-death: true # If the user get gamemode spectator after death.
+  ban-time: 30 # Ban time in minutes or 0 for permanent.
+  ban-ip: false # true or false, if the user should be IP banned.
 ```
 
 ### Permissions
