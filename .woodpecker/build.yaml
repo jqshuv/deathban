@@ -1,0 +1,10 @@
+when:
+  - event: push
+    branch: main
+
+steps:
+  steps:
+    - name: build
+      image: eclipse-temurin:17-jdk-alpine
+      commands:
+        - ./gradlew clean build

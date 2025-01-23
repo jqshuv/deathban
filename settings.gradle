@@ -5,3 +5,5 @@ pluginManagement {
 }
 
 rootProject.name = 'DeathBan'
+include 'MultiDeathBan'
+
