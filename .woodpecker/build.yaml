@@ -3,7 +3,7 @@ when:
     branch: main
 
 steps:
-  - name: build
+  - name: buildit
     image: eclipse-temurin:17-jdk-alpine
     commands:
       - ./gradlew clean build
