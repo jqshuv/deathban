@@ -4,6 +4,6 @@ when:
 
 steps:
   - name: build
-    image: eclipse-temurin:17-jdk-alpine
+    image: eclipse-temurin:21-jdk-alpine
     commands:
       - ./gradlew clean build
