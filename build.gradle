@@ -65,7 +65,7 @@ modrinth {
 }
 
 githubRelease {
-    token = System.getenv("GITHUB_TOKEN")
+    token = ""
     owner = "jqshuv"
     repo = "deathban"
     tagName = "v${project.version}"
