@@ -4,3 +4,4 @@ settings:
   spectator-after-death: true
   ban-time: 30
   ban-ip: false
+  ignore-permission: false

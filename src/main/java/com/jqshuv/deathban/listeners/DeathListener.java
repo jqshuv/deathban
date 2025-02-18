@@ -18,8 +18,8 @@ public class DeathListener implements Listener {
     public void onDeath(PlayerDeathEvent e) {
         Player p = e.getEntity().getPlayer();
         assert p != null;
-        if (!p.hasPermission("deathban.immune")) {
-            FileConfiguration fl = DeathBan.getInstance().getCustomConfig();
+        FileConfiguration fl = DeathBan.getInstance().getCustomConfig();
+        if (!p.hasPermission("deathban.immune") || fl.getBoolean("settings.ignore-permission")) {
             int tillBan = fl.getInt("settings.ban-delay");
             boolean banSpectator = fl.getBoolean("settings.spectator-after-death");
             boolean doIpBan = fl.getBoolean("settings.ban-ip");
@@ -39,35 +39,37 @@ public class DeathListener implements Listener {
                 date = cal.getTime();
             }
 
+            Date finalDate = date;
             if (tillBan == 0) {
-                if (banSpectator) {
-                    p.setGameMode(GameMode.SURVIVAL);
-                    p.setHealth(20.0);
-                    p.setFoodLevel(20);
-                    p.teleport(p.getWorld().getSpawnLocation());
-                }
-                if (doIpBan) {
-                    p.ban(fl.getString("settings.banreason"), date, "console", true);
-                } else {
-                    p.ban(fl.getString("settings.banreason"), date, "console", true);
-                }
+                banFunction(p, fl, banSpectator, doIpBan, finalDate);
+
             } else if (tillBan > 0) {
-                Date finalDate = date;
                 Bukkit.getScheduler().scheduleSyncDelayedTask(DeathBan.getInstance(), () -> {
-                    if (banSpectator) {
-                        p.setGameMode(GameMode.SURVIVAL);
-                        p.setHealth(20.0);
-                        p.setFoodLevel(20);
-                        p.teleport(p.getWorld().getSpawnLocation());
-                    }
-                    if (doIpBan) {
-                        p.banIp(fl.getString("settings.banreason"), finalDate, "console", true);
-                    } else {
-                        p.ban(fl.getString("settings.banreason"), finalDate, "console", true);
-                    }
+                    banFunction(p, fl, banSpectator, doIpBan, finalDate);
                 }, tillBan * 20L);
             }
 
         }
+    }
+
+    private void banFunction(Player p, FileConfiguration fl, boolean banSpectator, boolean doIpBan, Date finalDate) {
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(DeathBan.getInstance(), () -> {
+            if (banSpectator) {
+                p.setGameMode(GameMode.SURVIVAL);
+                p.setHealth(20.0);
+                p.setFoodLevel(20);
+                p.teleport(p.getWorld().getSpawnLocation());
+            }
+
+        }, 1L);
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(DeathBan.getInstance(), () -> {
+            if (doIpBan) {
+                p.banIp(fl.getString("settings.banreason"), finalDate, "console", true);
+            } else {
+                p.ban(fl.getString("settings.banreason"), finalDate, "console", true);
+            }
+        }, 10L);
     }
 }

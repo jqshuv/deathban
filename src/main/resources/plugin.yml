@@ -1,5 +1,5 @@
 name: DeathBan
-version: '1.2.1'
+version: '1.2.2'
 main: com.jqshuv.deathban.DeathBan
 api-version: '1.13'
 author: Jqshuv

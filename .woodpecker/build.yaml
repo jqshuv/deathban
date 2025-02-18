@@ -1,9 +1,0 @@
-when:
-  - event: push
-    branch: master
-
-steps:
-  - name: build
-    image: eclipse-temurin:21-jdk-alpine
-    commands:
-      - ./gradlew clean build

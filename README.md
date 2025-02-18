@@ -14,6 +14,7 @@ settings:
   spectator-after-death: true # If the user get gamemode spectator after death.
   ban-time: 30 # Ban time in minutes or 0 for permanent.
   ban-ip: false # true or false, if the user should be IP banned.
+  ignore-permission: false # true or false, if the users with permission should be ignored by the plugin.
 ```
 
 ### Permissions
