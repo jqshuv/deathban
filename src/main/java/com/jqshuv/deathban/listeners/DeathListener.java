@@ -1,6 +1,7 @@
 package com.jqshuv.deathban.listeners;
 
 import com.jqshuv.deathban.DeathBan;
+import com.jqshuv.deathban.utils.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -44,9 +45,9 @@ public class DeathListener implements Listener {
                 banFunction(p, fl, banSpectator, doIpBan, finalDate);
 
             } else if (tillBan > 0) {
-                p.getScheduler().runDelayed(DeathBan.getInstance(), (task) -> {
+                Scheduler.runDelayed(p, () -> {
                     banFunction(p, fl, banSpectator, doIpBan, finalDate);
-                }, null, tillBan * 20L);
+                }, tillBan * 20L);
             }
 
         }
@@ -54,7 +55,7 @@ public class DeathListener implements Listener {
 
     private void banFunction(Player p, FileConfiguration fl, boolean banSpectator, boolean doIpBan, Date finalDate) {
 
-        p.getScheduler().runDelayed(DeathBan.getInstance(), (task) -> {
+        Scheduler.runDelayed(p, () -> {
             if (banSpectator) {
                 p.setGameMode(GameMode.SURVIVAL);
                 p.setHealth(20.0);
@@ -62,14 +63,14 @@ public class DeathListener implements Listener {
                 p.teleport(p.getWorld().getSpawnLocation());
             }
 
-        }, null, 1L);
+        }, 1L);
 
-        p.getScheduler().runDelayed(DeathBan.getInstance(), (task) -> {
+        Scheduler.runDelayed(p, () -> {
             if (doIpBan) {
                 p.banIp(fl.getString("settings.banreason"), finalDate, "console", true);
             } else {
                 p.ban(fl.getString("settings.banreason"), finalDate, "console", true);
             }
-        }, null, 10L);
+        }, 10L);
     }
 }
