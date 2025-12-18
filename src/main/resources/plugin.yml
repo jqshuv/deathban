@@ -2,6 +2,7 @@ name: DeathBan
 version: '1.2.2'
 main: com.jqshuv.deathban.DeathBan
 api-version: '1.13'
+folia-supported: true
 author: Jqshuv
 permissions:
   deathban.immune:

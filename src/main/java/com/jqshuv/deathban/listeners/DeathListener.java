@@ -44,9 +44,9 @@ public class DeathListener implements Listener {
                 banFunction(p, fl, banSpectator, doIpBan, finalDate);
 
             } else if (tillBan > 0) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(DeathBan.getInstance(), () -> {
+                p.getScheduler().runDelayed(DeathBan.getInstance(), (task) -> {
                     banFunction(p, fl, banSpectator, doIpBan, finalDate);
-                }, tillBan * 20L);
+                }, null, tillBan * 20L);
             }
 
         }
@@ -54,7 +54,7 @@ public class DeathListener implements Listener {
 
     private void banFunction(Player p, FileConfiguration fl, boolean banSpectator, boolean doIpBan, Date finalDate) {
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(DeathBan.getInstance(), () -> {
+        p.getScheduler().runDelayed(DeathBan.getInstance(), (task) -> {
             if (banSpectator) {
                 p.setGameMode(GameMode.SURVIVAL);
                 p.setHealth(20.0);
@@ -62,14 +62,14 @@ public class DeathListener implements Listener {
                 p.teleport(p.getWorld().getSpawnLocation());
             }
 
-        }, 1L);
+        }, null, 1L);
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(DeathBan.getInstance(), () -> {
+        p.getScheduler().runDelayed(DeathBan.getInstance(), (task) -> {
             if (doIpBan) {
                 p.banIp(fl.getString("settings.banreason"), finalDate, "console", true);
             } else {
                 p.ban(fl.getString("settings.banreason"), finalDate, "console", true);
             }
-        }, 10L);
+        }, null, 10L);
     }
 }
