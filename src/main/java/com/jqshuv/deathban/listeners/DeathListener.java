@@ -69,10 +69,10 @@ public class DeathListener implements Listener {
         Scheduler.runDelayed(p, () -> {
             if (doIpBan) {
                 Bukkit.getBanList(org.bukkit.BanList.Type.IP).addBan(p.getAddress().getAddress().getHostAddress(), banReason, finalDate, "console");
-                p.kickPlayer(banReason);
+                Scheduler.kick(p, banReason);
             } else {
                 Bukkit.getBanList(org.bukkit.BanList.Type.NAME).addBan(p.getName(), banReason, finalDate, "console");
-                p.kickPlayer(banReason);
+                Scheduler.kick(p, banReason);
             }
         }, 10L);
     }

@@ -48,6 +48,21 @@ public class Scheduler {
         return IS_FOLIA;
     }
 
+    public static void kick(Player player, String reason) {
+        try {
+            // Try Paper/Adventure API first
+            Class<?> componentClass = Class.forName("net.kyori.adventure.text.Component");
+            java.lang.reflect.Method textMethod = componentClass.getMethod("text", String.class);
+            Object reasonComponent = textMethod.invoke(null, reason);
+            
+            java.lang.reflect.Method kickMethod = player.getClass().getMethod("kick", componentClass);
+            kickMethod.invoke(player, reasonComponent);
+        } catch (Exception e) {
+            // Fallback to Spigot/Bukkit
+            player.kickPlayer(reason);
+        }
+    }
+
     private static boolean isClassPresent(String className) {
         try {
             Class.forName(className);
