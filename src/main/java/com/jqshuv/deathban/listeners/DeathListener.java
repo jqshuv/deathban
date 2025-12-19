@@ -1,6 +1,9 @@
 package com.jqshuv.deathban.listeners;
 
 import com.jqshuv.deathban.DeathBan;
+import com.jqshuv.deathban.utils.Scheduler;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -44,7 +47,7 @@ public class DeathListener implements Listener {
                 banFunction(p, fl, banSpectator, doIpBan, finalDate);
 
             } else if (tillBan > 0) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(DeathBan.getInstance(), () -> {
+                Scheduler.runDelayed(p, () -> {
                     banFunction(p, fl, banSpectator, doIpBan, finalDate);
                 }, tillBan * 20L);
             }
@@ -53,8 +56,9 @@ public class DeathListener implements Listener {
     }
 
     private void banFunction(Player p, FileConfiguration fl, boolean banSpectator, boolean doIpBan, Date finalDate) {
+        String banReason = fl.getString("settings.banreason");
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(DeathBan.getInstance(), () -> {
+        Scheduler.runDelayed(p, () -> {
             if (banSpectator) {
                 p.setGameMode(GameMode.SURVIVAL);
                 p.setHealth(20.0);
@@ -64,11 +68,16 @@ public class DeathListener implements Listener {
 
         }, 1L);
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(DeathBan.getInstance(), () -> {
+        Scheduler.runDelayed(p, () -> {
+            TextComponent reasonComponent = (TextComponent) DeathBan.getMiniMessage().deserialize(banReason);
+            String legacyReason = LegacyComponentSerializer.legacySection().serialize(reasonComponent);
+
             if (doIpBan) {
-                p.banIp(fl.getString("settings.banreason"), finalDate, "console", true);
+                Bukkit.getBanList(org.bukkit.BanList.Type.IP).addBan(p.getAddress().getAddress().getHostAddress(), legacyReason, finalDate, "console");
+                Scheduler.kick(p, banReason);
             } else {
-                p.ban(fl.getString("settings.banreason"), finalDate, "console", true);
+                Bukkit.getBanList(org.bukkit.BanList.Type.NAME).addBan(p.getName(), legacyReason, finalDate, "console");
+                Scheduler.kick(p, banReason);
             }
         }, 10L);
     }
