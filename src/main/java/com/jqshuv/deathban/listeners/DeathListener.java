@@ -54,22 +54,25 @@ public class DeathListener implements Listener {
     }
 
     private void banFunction(Player p, FileConfiguration fl, boolean banSpectator, boolean doIpBan, Date finalDate) {
+        String banReason = fl.getString("settings.banreason");
 
         Scheduler.runDelayed(p, () -> {
             if (banSpectator) {
                 p.setGameMode(GameMode.SURVIVAL);
                 p.setHealth(20.0);
                 p.setFoodLevel(20);
-                p.teleport(p.getWorld().getSpawnLocation());
+                p.teleportAsync(p.getWorld().getSpawnLocation());
             }
 
         }, 1L);
 
         Scheduler.runDelayed(p, () -> {
             if (doIpBan) {
-                p.banIp(fl.getString("settings.banreason"), finalDate, "console", true);
+                Bukkit.getBanList(org.bukkit.BanList.Type.IP).addBan(p.getAddress().getAddress().getHostAddress(), banReason, finalDate, "console");
+                p.kickPlayer(banReason);
             } else {
-                p.ban(fl.getString("settings.banreason"), finalDate, "console", true);
+                Bukkit.getBanList(org.bukkit.BanList.Type.NAME).addBan(p.getName(), banReason, finalDate, "console");
+                p.kickPlayer(banReason);
             }
         }, 10L);
     }
