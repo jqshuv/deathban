@@ -2,6 +2,8 @@ package com.jqshuv.deathban.listeners;
 
 import com.jqshuv.deathban.DeathBan;
 import com.jqshuv.deathban.utils.Scheduler;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -61,17 +63,20 @@ public class DeathListener implements Listener {
                 p.setGameMode(GameMode.SURVIVAL);
                 p.setHealth(20.0);
                 p.setFoodLevel(20);
-                p.teleportAsync(p.getWorld().getSpawnLocation());
+                p.teleport(p.getWorld().getSpawnLocation());
             }
 
         }, 1L);
 
         Scheduler.runDelayed(p, () -> {
+            TextComponent reasonComponent = (TextComponent) DeathBan.getMiniMessage().deserialize(banReason);
+            String legacyReason = LegacyComponentSerializer.legacySection().serialize(reasonComponent);
+
             if (doIpBan) {
-                Bukkit.getBanList(org.bukkit.BanList.Type.IP).addBan(p.getAddress().getAddress().getHostAddress(), banReason, finalDate, "console");
+                Bukkit.getBanList(org.bukkit.BanList.Type.IP).addBan(p.getAddress().getAddress().getHostAddress(), legacyReason, finalDate, "console");
                 Scheduler.kick(p, banReason);
             } else {
-                Bukkit.getBanList(org.bukkit.BanList.Type.NAME).addBan(p.getName(), banReason, finalDate, "console");
+                Bukkit.getBanList(org.bukkit.BanList.Type.NAME).addBan(p.getName(), legacyReason, finalDate, "console");
                 Scheduler.kick(p, banReason);
             }
         }, 10L);
