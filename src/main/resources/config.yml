@@ -1,7 +1,9 @@
 settings:
-  banreason: "Game Over!"
+  banreason: "<bold><red>Game Over!</red></bold>\n\n<gray>You were banned for dying in combat.\n\nBan Duration: <yellow>30 minutes</yellow>\nBan Type: <aqua>Deathban</aqua></gray>"
   ban-delay: 3
   spectator-after-death: true
   ban-time: 30
   ban-ip: false
   ignore-permission: false
+  player-kill-only: false
+  debug: false

@@ -1,8 +1,6 @@
 package com.jqshuv.deathban.utils;
 
 import com.jqshuv.deathban.DeathBan;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -23,56 +21,95 @@ public class Scheduler {
     }
 
     public static void runDelayed(Player player, Runnable runnable, long delayTicks) {
+        DeathBan.debug("Scheduling task for player " + player.getName() + " with delay " + delayTicks + " ticks");
+
+        // Wrap the runnable to check player state before execution
+        Runnable safeRunnable = () -> {
+            if (player.isOnline()) {
+                DeathBan.debug("Executing scheduled task for " + player.getName());
+                runnable.run();
+            } else {
+                DeathBan.debug("Skipping scheduled task - player " + player.getName() + " is offline");
+            }
+        };
+
         if (IS_FOLIA) {
+            DeathBan.debug("Using Folia EntityScheduler");
             try {
                 // Try to get the EntityScheduler from the player
                 Object scheduler = player.getClass().getMethod("getScheduler").invoke(player);
                 // Folia EntityScheduler.runDelayed signature:
                 // ScheduledTask runDelayed(Plugin plugin, Consumer<ScheduledTask> task, Runnable retired, long delayTicks)
                 scheduler.getClass().getMethod("runDelayed", org.bukkit.plugin.Plugin.class, java.util.function.Consumer.class, Runnable.class, long.class)
-                        .invoke(scheduler, DeathBan.getInstance(), (java.util.function.Consumer<Object>) task -> runnable.run(), null, delayTicks);
+                        .invoke(scheduler, DeathBan.getInstance(), (java.util.function.Consumer<Object>) task -> safeRunnable.run(), null, delayTicks);
+                DeathBan.debug("Task scheduled successfully using Folia");
                 return; // Success
             } catch (Exception e) {
                 DeathBan.getInstance().getLogger().warning("Folia detected but failed to use EntityScheduler: " + e.getMessage());
                 // If it fails, we don't fallback to Bukkit scheduler on Folia because it WILL throw UnsupportedOperationException
                 // Instead, we run it immediately or log a severe error
                 DeathBan.getInstance().getLogger().severe("COULD NOT SCHEDULE TASK ON FOLIA! Running immediately as fallback.");
-                runnable.run();
+                safeRunnable.run();
                 return;
             }
         }
         
         // Fallback for Spigot/Paper
-        Bukkit.getScheduler().runTaskLater(DeathBan.getInstance(), runnable, delayTicks);
+        DeathBan.debug("Using Bukkit scheduler");
+        Bukkit.getScheduler().runTaskLater(DeathBan.getInstance(), safeRunnable, delayTicks);
+        DeathBan.debug("Task scheduled successfully using Bukkit scheduler");
     }
 
     public static boolean isFolia() {
         return IS_FOLIA;
     }
 
-    public static void kick(Player player, String reason) {
-        TextComponent reasonComponent = (TextComponent) DeathBan.getMiniMessage().deserialize(reason);
+    public static void teleportAsync(Player player, org.bukkit.Location location) {
+        DeathBan.debug("Attempting to teleport player " + player.getName() + " to " + location.getWorld().getName() + " (" + location.getX() + ", " + location.getY() + ", " + location.getZ() + ")");
+
+        if (IS_FOLIA) {
+            try {
+                // Use Folia's teleportAsync method
+                Object scheduler = player.getClass().getMethod("getScheduler").invoke(player);
+                scheduler.getClass().getMethod("teleport", org.bukkit.plugin.Plugin.class, org.bukkit.Location.class)
+                        .invoke(scheduler, DeathBan.getInstance(), location);
+                DeathBan.debug("Player teleported successfully using Folia teleportAsync");
+                return;
+            } catch (Exception e) {
+                DeathBan.getInstance().getLogger().warning("Folia teleport failed: " + e.getMessage());
+            }
+        }
+
+        // Fallback for Spigot/Paper
         try {
-            // Try Paper/Adventure API first
-            // Class<?> componentClass = Class.forName("net.kyori.adventure.text.Component");
-             // Ensure Adventure is loaded
-            Class<?> componentClass = reasonComponent.getClass();
-            
-            java.lang.reflect.Method kickMethod = player.getClass().getMethod("kick", componentClass);
-            kickMethod.invoke(player, reasonComponent);
+            player.teleport(location);
+            DeathBan.debug("Player teleported successfully using Bukkit teleport");
         } catch (Exception e) {
-            // Fallback to Spigot/Bukkit
-            String legacyReason = LegacyComponentSerializer.legacySection().serialize(reasonComponent);
-            player.kickPlayer(legacyReason);
+            DeathBan.getInstance().getLogger().warning("Teleport failed: " + e.getMessage());
         }
     }
 
-    private static boolean isClassPresent(String className) {
+    public static void kick(Player player, String reason) {
+        DeathBan.debug("Attempting to kick player " + player.getName() + " with reason: " + reason);
         try {
-            Class.forName(className);
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
+            // Use MiniMessage to deserialize the reason string properly
+            Object reasonComponent = DeathBan.getMiniMessage().deserialize(reason);
+
+            // Use the native Paper/Adventure API
+            player.kick((net.kyori.adventure.text.Component) reasonComponent);
+            DeathBan.debug("Player kicked successfully using Adventure API");
+        } catch (Exception e) {
+            DeathBan.debug("Failed to kick using Adventure API: " + e.getMessage() + " - trying fallback");
+            // Fallback - kick with plain text
+            try {
+                net.kyori.adventure.text.Component plainComponent = net.kyori.adventure.text.Component.text(reason);
+                player.kick(plainComponent);
+                DeathBan.debug("Player kicked successfully using plain text fallback");
+            } catch (Exception ex) {
+                // Last resort fallback
+                DeathBan.getInstance().getLogger().warning("Could not kick player using Adventure API: " + ex.getMessage());
+                DeathBan.debug("All kick methods failed");
+            }
         }
     }
 }

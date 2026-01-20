@@ -60,4 +60,10 @@ public final class DeathBan extends JavaPlugin {
     public static MiniMessage getMiniMessage() {
         return miniMessage;
     }
+
+    public static void debug(String message) {
+        if (INSTANCE != null && INSTANCE.getCustomConfig().getBoolean("settings.debug", false)) {
+            INSTANCE.getLogger().info("[DEBUG] " + message);
+        }
+    }
 }
